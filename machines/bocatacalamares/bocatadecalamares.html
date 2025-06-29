@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bocata de Calamares - Writeup</title>
+    <link rel="stylesheet" href="../../styles.css" />
+</head>
+<body>
+    <header>
+        <h1>Bocata de Calamares</h1>
+        <nav id="main-nav">
+            <a href="../../writeups.html" class="nav-link">← Volver atrás</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Descripción</h2>
+        <p>Nombre: Bocata de Calamares</p>
+        <p>Fecha de creación 11/01/2025</p>
+        <p>MD5: a64727943bdb712743be13ecbb5b6d5a</p>
+
+        <h2>Resumen</h2>
+        <p>En este writeup se documenta la explotación de la máquina Bocata de Calamares. Se realiza un escaneo de puertos, una enumeración de servicios web y se identifican vulnerabilidades como inyección SQL y lectura de archivos (LFI). Finalmente, se logra la escalada de privilegios mediante la ejecución de un binario con permisos especiales.</p>
+
+        <h2>Writeup</h2>
+        <ol>
+            <li>
+                <strong>Reconocimiento</strong><br />
+                Primero se realiza un escaneo de puertos para descubrir los servicios activos:<br />
+                <code>sudo nmap -p- -Pn --min-rate 5000 --open -sS 192.168.18.252</code><br />
+                Resultado:<br />
+                <img src="nmap.png" alt="Escaneo de puertos" style="max-width: 100%; height: auto;" />
+            </li>
+
+            <li>
+                <strong>Enumeración</strong><br />
+                Al encontrar el puerto 80 abierto, accedemos vía navegador y luego usamos gobuster para buscar directorios ocultos:<br />
+                <code>gobuster dir -u http://192.168.18.252 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,txt,js,bak,html,zip -t 20 -a "Mozilla/5.0"</code><br />
+                Resultado:<br />
+                <img src="web.jpg" alt="Sitio web" style="max-width: 100%; height: auto;" />
+                <img src="gobuster.jpg" alt="Gobuster resultados" style="max-width: 100%; height: auto;" />
+            </li>
+
+            <li>
+                <strong>Explotación</strong><br />
+                Visitamos <code>/login</code> y probamos una inyección SQL simple para acceder como admin:<br />
+                <img src="login.jpg" alt="Formulario login" style="max-width: 100%; height: auto;" />
+                <img src="inyeccion.jpg" alt="Inyección SQL" style="max-width: 100%; height: auto;" />
+                <img src="admin.jpg" alt="Acceso admin" style="max-width: 100%; height: auto;" />
+                <p>En la sección <code>/to-do-list</code> encontramos una referencia codificada en base64 hacia un lector de archivos:</p>
+                <img src="todolist.jpg" alt="To-do list" style="max-width: 100%; height: auto;" />
+                <img src="base64.jpg" alt="Decodificación base64" style="max-width: 100%; height: auto;" />
+                <p>Accedemos al recurso decodificado y al inspeccionar el código de la página nos dice que podemos acceder a los archivos de usuarios:</p>
+                <img src="leearchivos1.jpg" alt="Lectura de archivos" style="max-width: 100%; height: auto;" />
+                <img src="leearchivos2.jpg" alt="Archivos accesibles" style="max-width: 100%; height: auto;" />
+                <p>Leemos <code>/etc/passwd</code> para obtener los usuarios:</p>
+                <img src="etcpasswd.jpg" alt="etc/passwd" style="max-width: 100%; height: auto;" />
+                <p>Identificamos al usuario "superadministrador" y realizamos un ataque con Hydra para creackear su password:</p>
+                <img src="hydra.jpg" alt="Hydra ataque" style="max-width: 100%; height: auto;" />
+                <p>Una vez obtenida la contraseña, nos conectamos por SSH:</p>
+                <img src="ssh.jpg" alt="SSH acceso" style="max-width: 100%; height: auto;" />
+                <p>Ya estamos dentro del sistema, asi que procedemos a leer la flag del usuario:</p>
+                <img src="userflag.jpg" alt="Flag usuario" style="max-width: 100%; height: auto;" />
+                <p>En el archivo <code>recordatorio.txt</code> se nos sugiere el uso de GTFOBins. Si hacemos un <code>sudo -l</code>, vemos que el archivo find se puede ejecutar con permisos de root:</p>
+                <img src="find.png" alt="Sudo find" style="max-width: 100%; height: auto;" />
+                <p>Usamos el binario <code>find</code> para escalar privilegios:</p>
+                <img src="escaladaprivilegios.jpg" alt="Root acceso" style="max-width: 100%; height: auto;" />
+                <p>Y finalmente, accedemos a <code>/root</code> y leemos la flag del root en: <code>root.txt</code>.</p>
+            </li>
+        </ol>
+
+        <h2>Escalada de privilegios</h2>
+        <p>Realizamos un <code>sudo -l</code> y descubrimos que el binario <code>find</code> puede ser ejecutado como root sin contraseña. Usando GTFOBins, ejecutamos:</p>
+        <code>sudo find . -exec /bin/sh \; -quit</code><br />
+        <p>Con esto obtenemos acceso como root y podemos leer la flag <code>/root/root.txt</code>.</p>
+
+        <h2>Conclusiones</h2>
+        <p>En este ejercicio de explotación de la máquina Bocata de Calamares, se aplicaron técnicas esenciales de pentesting como escaneo de puertos, enumeración web, explotación mediante inyección SQL y análisis de archivos internos.</p><br />
+        <p>La explotación de una contraseña débil mediante fuerza bruta y el uso de binarios con permisos especiales como <code>find</code> permitieron escalar privilegios y comprometer completamente el sistema.</p><br />
+        <p>Este laboratorio refuerza la importancia de combinar herramientas de enumeración, buenas prácticas de autenticación y configuración de privilegios para asegurar los sistemas frente a accesos no autorizados.</p>
+    </main>
+
+    <footer>
+        <p>© 2025 Bocata de Calamares Writeup. Diseñado y desarrollado por Y3i$i.</p>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>
