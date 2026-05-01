@@ -6,6 +6,14 @@ El objetivo principal es documentar el proceso de resolución, reforzar conocimi
 
 ---
 
+## 🌐 Web / Repositorio
+
+Puedes ver el proyecto completo aquí:
+
+https://yeeiisi.github.io/Blog-de-Writeups/index.html
+
+---
+
 ## 🎯 Propósito
 
 Este blog existe para:
