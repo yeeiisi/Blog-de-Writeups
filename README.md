@@ -33,10 +33,10 @@ Este blog existe para:
 
 Cada carpeta corresponde a un CTF o evento específico:
 CTF_NAME/
-├── challenge-name/
-│   ├── writeup.md
-│   ├── files/
-│   ├── exploit.py (si tiene)
+- challenge-name/
+  - writeup.md
+  - files/
+  - exploit.py (si tiene)
 
 
 Cada writeup incluye:
