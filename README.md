@@ -32,7 +32,7 @@ Este blog existe para:
 ## 📂 Estructura del repositorio
 
 Cada carpeta corresponde a un CTF o evento específico:
--CTF_NAME/
+- CTF_NAME/
   - challenge-name/
     - writeup.md
     - files/
