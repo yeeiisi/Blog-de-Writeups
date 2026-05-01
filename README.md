@@ -111,3 +111,12 @@ Si este repositorio te resulta útil para aprender ciberseguridad o CTF:
 - Síguelo para futuras actualizaciones
 
 ---
+
+## 🖊️ Sugerencias
+
+Si tienes ideas, mejoras o encuentras algún error en los writeups, eres bienvenido/a a contribuir.
+
+- Puedes abrir un issue 🐛
+- O proponer mejoras mediante pull request 🚀
+
+Toda sugerencia es apreciada y ayuda a mejorar la calidad del contenido.
